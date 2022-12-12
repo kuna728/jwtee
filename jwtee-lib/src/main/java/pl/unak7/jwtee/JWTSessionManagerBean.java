@@ -5,7 +5,9 @@ import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -18,10 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import javax.annotation.PostConstruct;
 
 
@@ -29,13 +28,10 @@ import javax.annotation.PostConstruct;
 @Stateful
 public class JWTSessionManagerBean implements JWTSessionManager{
 
-//    @Inject
-    private HttpServletRequest httpRequest;
+    @Inject
+    JWTSessionConfigurationManager configurationManager;
 
-//    @Inject
-    private HttpServletResponse httpResponse;
-
-    private Algorithm algorithm;
+    private Map<String, String> jsonMap;
 
     private ObjectMapper objectMapper;
 
@@ -43,64 +39,55 @@ public class JWTSessionManagerBean implements JWTSessionManager{
 
     @PostConstruct
     void init() {
-        try {
-            this.algorithm = Algorithm.HMAC256("secr3t");
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
         this.objectMapper = new ObjectMapper();
     }
 
     @Override
-    public void initialize(HttpServletRequest request, HttpServletResponse response) {
-        this.httpRequest = request;
-        this.httpResponse = response;
-    }
-
-
-    @Override
-    public Object get(String key) throws IOException, TokenNotFoundException {
-        String token = getToken();
-        DecodedJWT jwt = decodeJWT(token);
-        String decodedPayload = new String(Base64.getDecoder().decode(jwt.getPayload()));
-        Map<String, Object> objectMap = objectMapper.readValue(decodedPayload, new TypeReference<Map<String, Object>>(){});
-        return objectMap.get(key);
+    public Object get(String key, TypeReference typeReference) throws IOException, TokenNotFoundException {
+        if(!jsonMap.containsKey(key))
+            return null;
+        return objectMapper.readValue(jsonMap.get(key), typeReference);
     }
 
     @Override
-    public Map<String, Object> getMap() throws IOException, TokenNotFoundException {
-        String token = getToken();
-        DecodedJWT jwt = decodeJWT(token);
-        String decodedPayload = new String(Base64.getDecoder().decode(jwt.getPayload()));
-        return objectMapper.readValue(decodedPayload, new TypeReference<Map<String, Object>>(){});
+    public String getJSON(String key) throws IOException, TokenNotFoundException {
+        return jsonMap.get(key);
     }
 
     @Override
-    public void put(String key, Object value) throws IOException, TokenNotFoundException {
+    public Map<String, String> getJSONMap() {
+        return jsonMap;
+    }
+
+    @Override
+    public void put(String key, Object value) throws IOException {
+        jsonMap.put(key, objectMapper.writeValueAsString(value));
+    }
+
+    @Override
+    public String getToken() {
         JWTCreator.Builder jwtBuilder = JWT.create();
+        for (String objectKey : jsonMap.keySet()) {
+            jwtBuilder.withClaim(objectKey, jsonMap.get(objectKey));
+        }
+        return jwtBuilder.sign(configurationManager.getConfiguration().getAlgorithm());
+    }
+
+    @Override
+    public void setToken(String token) throws IOException {
+        if(token == null || token.isEmpty() || token.equals("null")) {
+            this.jsonMap = new HashMap<>();
+            return;
+        }
+        JWTVerifier verifier = JWT.require(configurationManager.getConfiguration().getAlgorithm()).build();
         try {
-            String inToken = getToken();
-            DecodedJWT jwt = decodeJWT(inToken);
-            String decodedPayload = new String(Base64.getDecoder().decode(jwt.getPayload()));
-            Map<String, String> objectMap = objectMapper.readValue(decodedPayload, new TypeReference<Map<String, Object>>() {
-            });
-            for (String objectKey : objectMap.keySet()) {
-                jwtBuilder.withClaim(objectKey, objectMap.get(objectKey));
-            }
-        } catch(TokenNotFoundException exception) { }
-        String outToken = jwtBuilder.withClaim(key, objectMapper.writeValueAsString(value)).sign(algorithm);
-        httpResponse.setHeader("token", outToken);
+            DecodedJWT jwt = verifier.verify(token);
+            String payload = new String(Base64.getDecoder().decode(jwt.getPayload()));
+            this.jsonMap = objectMapper.readValue(payload, new TypeReference<Map<String, String>>(){});
+        } catch (JWTVerificationException e) {
+            this.jsonMap = new HashMap<>();
+        }
+
     }
 
-    private DecodedJWT decodeJWT(String token) {
-        JWTVerifier verifier = JWT.require(algorithm).build();
-        return verifier.verify(token);
-    }
-
-    private String getToken() throws TokenNotFoundException{
-        String token = httpRequest.getHeader("token");
-        if(token == null || token.isEmpty() || token.equals("null"))
-            throw new TokenNotFoundException("Token not found in request");
-        return token;
-    }
 }

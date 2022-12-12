@@ -64,15 +64,14 @@ public class TodoItemResource {
     }
 
     private List<TodoItemDTO> getItemsFromToken() {
-        List<TodoItemDTO> items;
         ObjectMapper objectMapper = new ObjectMapper();
+        List<TodoItemDTO> items;
         try {
-            String items_str = (String) sessionManager.get("items");
-            items = objectMapper.readValue(items_str, new TypeReference<List<TodoItemDTO>>(){});
+            items = (List<TodoItemDTO>) sessionManager.get("items", new TypeReference<List<TodoItemDTO>>(){});
         } catch (IOException | TokenNotFoundException e) {
             items = new ArrayList<>();
         }
-        return items;
+        return items == null ? new ArrayList<>() : items;
     }
 
 }
