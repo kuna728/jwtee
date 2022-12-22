@@ -1,22 +1,37 @@
 package pl.unak7.jwtee;
 
-import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import org.apache.commons.lang3.NotImplementedException;
 
 import javax.ejb.Local;
-import javax.ejb.Remote;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpSessionContext;
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.Map;
-import java.util.Objects;
 
 @Local
-public interface JWTSessionManager {
-    Object get(String key, TypeReference typeReference) throws IOException, TokenNotFoundException;
-    String getJSON(String key) throws IOException, TokenNotFoundException;
-    Map<String, String> getJSONMap() throws IOException, TokenNotFoundException;
-    void put(String key, Object value) throws IOException, TokenNotFoundException;
-    String getToken() throws TokenNotFoundException;
-    void setToken(String token) throws IOException;
+public interface JWTSessionManager extends HttpSession {
+
+    <T> T getAttribute(String key, TypeReference<T> typeReference);
+
+    String getToken();
+
+    void setToken(String token);
+
+    @Override
+    default String getId() {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    default ServletContext getServletContext() {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    default HttpSessionContext getSessionContext() {
+        throw new NotImplementedException();
+    }
 }

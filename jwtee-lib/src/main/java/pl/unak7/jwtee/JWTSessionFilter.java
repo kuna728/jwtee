@@ -24,13 +24,8 @@ public class JWTSessionFilter implements Filter {
 
         filterChain.doFilter(servletRequest, servletResponse);
 
-        TokenAttachStrategyEnum attachStrategy = configurationManager.getConfiguration().getTokenAttachStrategy();
-        try {
-            if(attachStrategy == TokenAttachStrategyEnum.ALWAYS || (
-                    attachStrategy == TokenAttachStrategyEnum.UPDATE
-                    && !token.equals(sessionManager.getToken()))){
-                ((HttpServletResponse) servletResponse).setHeader(headerName, sessionManager.getToken());
-            }
-        } catch (TokenNotFoundException e) { }
+        if(configurationManager.getConfiguration().isAttachTokenToResponse()){
+            ((HttpServletResponse) servletResponse).setHeader(headerName, sessionManager.getToken());
+        }
     }
 }

@@ -3,7 +3,6 @@ package pl.unak7.jwtee.samples.todo;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import pl.unak7.jwtee.JWTSessionManager;
-import pl.unak7.jwtee.TokenNotFoundException;
 import pl.unak7.jwtee.samples.todo.dto.NewItemDTO;
 import pl.unak7.jwtee.samples.todo.dto.TodoItemDTO;
 import pl.unak7.jwtee.samples.todo.dto.UpdateItemDTO;
@@ -40,7 +39,7 @@ public class TodoItemResource {
         try {
             sessionManager.put("items", items);
             return Response.status(Response.Status.CREATED).entity(itemToAdd).build();
-        } catch (IOException | TokenNotFoundException e) {
+        } catch (IOException e) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
     }
@@ -58,7 +57,7 @@ public class TodoItemResource {
         try {
             sessionManager.put("items", items);
             return Response.status(Response.Status.OK).entity(itemToUpdate).build();
-        } catch (IOException | TokenNotFoundException e) {
+        } catch (IOException e) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
     }
@@ -68,7 +67,7 @@ public class TodoItemResource {
         List<TodoItemDTO> items;
         try {
             items = (List<TodoItemDTO>) sessionManager.get("items", new TypeReference<List<TodoItemDTO>>(){});
-        } catch (IOException | TokenNotFoundException e) {
+        } catch (IOException e) {
             items = new ArrayList<>();
         }
         return items == null ? new ArrayList<>() : items;

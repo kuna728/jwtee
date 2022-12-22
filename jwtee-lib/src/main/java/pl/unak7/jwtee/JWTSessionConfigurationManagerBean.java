@@ -35,9 +35,9 @@ public class JWTSessionConfigurationManagerBean implements JWTSessionConfigurati
                 RandomStringUtils.random(300) : configuration.getSecret();
 
         builder.headerName(configuration.getHeaderName())
+                .encryptToken(configuration.isEncryptToken())
                 .encryptionSecret(configuration.getEncryptionSecret())
-                .encryptionSecret(configuration.getEncryptionSecret())
-                .tokenAttachStrategy(configuration.getTokenAttachStrategy())
+                .attachTokenToResponse(configuration.isAttachTokenToResponse())
                 .secret(secret);
         try {
             builder.algorithm(configuration.getAlgorithm() == null ?

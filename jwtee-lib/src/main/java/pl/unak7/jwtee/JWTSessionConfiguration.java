@@ -11,7 +11,7 @@ public class JWTSessionConfiguration {
     private String headerName = "token";
 
     @Builder.Default
-    private int maxInactiveInterval = 86400;
+    private int maxInactiveInterval = 24 * 60 * 60;
 
     private String secret;
 
@@ -24,5 +24,5 @@ public class JWTSessionConfiguration {
     private String encryptionSecret = null;
 
     @Builder.Default
-    private TokenAttachStrategyEnum tokenAttachStrategy = TokenAttachStrategyEnum.ALWAYS;
+    private boolean attachTokenToResponse = true;
 }
