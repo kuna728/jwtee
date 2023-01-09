@@ -15,6 +15,7 @@ import lombok.Setter;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
@@ -22,15 +23,17 @@ import java.util.Map;
 
 public class Utils {
 
-    public static final String secret = "secr4t";
-    public static final long exampleCreationTime = 1672177452134L;
-    public static final long exampleLastAccessedTime = 1672177461043L;
+    public static final String exampleSecret = "secr4t";
+    public static final long exampleCreationTime = Instant.now().minusSeconds(4*60*60).toEpochMilli();
+    public static final long exampleLastAccessedTime = Instant.now().minusSeconds(60*60).toEpochMilli();
+    public static final int exampleMaxInactiveInterval = 12 * 60 * 60;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public String generateToken(Algorithm algorithm, long creationTime, long lastAccessedTime, Map<String, Object> payload) {
+    public String generateToken(Algorithm algorithm, long creationTime, long lastAccessedTime, int maxInactiveInterval, Map<String, Object> payload) {
         JWTCreator.Builder jwtBuilder = JWT.create();
         jwtBuilder.withClaim("ct", creationTime);
         jwtBuilder.withClaim("lat", lastAccessedTime);
+        jwtBuilder.withClaim("mii", maxInactiveInterval);
         try {
             String pl = objectMapper.writeValueAsString(payload);
             jwtBuilder.withClaim("session", objectMapper.writeValueAsString(payload));
@@ -60,14 +63,14 @@ public class Utils {
 
     public Algorithm getExampleAlgorithm() {
         try {
-            return Algorithm.HMAC256(secret);
+            return Algorithm.HMAC256(exampleSecret);
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
     }
 
     public String generateExampleToken() {
-        return generateToken(getExampleAlgorithm(), exampleCreationTime, exampleLastAccessedTime, getExampleSession());
+        return generateToken(getExampleAlgorithm(), exampleCreationTime, exampleLastAccessedTime, exampleMaxInactiveInterval, getExampleSession());
     }
 
     public Map<String, Object> getPayloadFromToken(String token, Algorithm algorithm) throws IOException {

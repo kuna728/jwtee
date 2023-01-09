@@ -4,7 +4,6 @@ package pl.unak7.jwtee;
 import com.auth0.jwt.algorithms.Algorithm;
 import org.apache.commons.lang3.RandomStringUtils;
 
-import javax.annotation.PostConstruct;
 import javax.ejb.Stateful;
 import javax.enterprise.context.ApplicationScoped;
 import java.io.UnsupportedEncodingException;
@@ -12,12 +11,8 @@ import java.io.UnsupportedEncodingException;
 @ApplicationScoped
 @Stateful
 public class JWTSessionConfigurationManagerBean implements JWTSessionConfigurationManager{
-    private JWTSessionConfiguration configuration = null;
-
-    @PostConstruct
-    void init() {
-        configuration = JWTSessionConfiguration.builder().build();
-    }
+    private JWTSessionConfiguration configuration = JWTSessionConfiguration.builder().build();
+    private final String randomSecret = RandomStringUtils.random(300);
 
     @Override
     public void configure(JWTSessionConfiguration configuration) {
@@ -26,24 +21,13 @@ public class JWTSessionConfigurationManagerBean implements JWTSessionConfigurati
 
     @Override
     public JWTSessionConfiguration getConfiguration() {
-        return buildConfigurationWithDefaults();
+        if(configuration.getAlgorithm() == null) {
+            try {
+                configuration.setAlgorithm(Algorithm.HMAC256(randomSecret));
+            } catch (UnsupportedEncodingException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return configuration;
     }
-
-    private JWTSessionConfiguration buildConfigurationWithDefaults() {
-        JWTSessionConfiguration.JWTSessionConfigurationBuilder builder = JWTSessionConfiguration.builder();
-        String secret = configuration.getSecret() == null || configuration.getSecret().isEmpty() ?
-                RandomStringUtils.random(300) : configuration.getSecret();
-
-        builder.headerName(configuration.getHeaderName())
-                .encryptToken(configuration.isEncryptToken())
-                .encryptionSecret(configuration.getEncryptionSecret())
-                .attachTokenToResponse(configuration.isAttachTokenToResponse())
-                .secret(secret);
-        try {
-            builder.algorithm(configuration.getAlgorithm() == null ?
-                    Algorithm.HMAC256(secret) : configuration.getAlgorithm());
-        } catch (UnsupportedEncodingException e) { }
-        return builder.build();
-    }
-
 }

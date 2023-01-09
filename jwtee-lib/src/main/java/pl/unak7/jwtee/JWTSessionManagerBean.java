@@ -4,11 +4,13 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import javax.annotation.PostConstruct;
 import javax.ejb.*;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -22,6 +24,8 @@ public class JWTSessionManagerBean implements JWTSessionManager{
 
     private final static String INVALIDATED_SESSION_EXCEPTION_MESSAGE = "Session was invalidated";
 
+    private final static TypeReference mapTypeReference = new TypeReference<Map<String, Object>>(){};
+
     @Inject
     JWTSessionConfigurationManager configurationManager;
 
@@ -29,26 +33,29 @@ public class JWTSessionManagerBean implements JWTSessionManager{
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    private long lastAccessedTime;
-
     private long creationTime;
+
+    private long lastAccessedTime;
 
     private int maxInactiveInterval;
 
     private boolean isInvalidated = false;
 
-    private boolean isExpired = false;
-
     public JWTSessionManagerBean() { }
+
+    @PostConstruct
+    public void init() {
+        setDefaults();
+    }
 
     @Override
     public String getToken() {
-        if(isInvalidated)
+        if(isInvalidated || (!configurationManager.getConfiguration().isPermitEmptySession() && sessionData.isEmpty()))
             return null;
 
         JWTCreator.Builder jwtBuilder = JWT.create();
         jwtBuilder.withClaim("ct", creationTime);
-        jwtBuilder.withClaim("lat", Date.from(Instant.now()).getTime());
+        jwtBuilder.withClaim("lat", Instant.now().toEpochMilli());
         jwtBuilder.withClaim("mii", maxInactiveInterval);
         try {
             jwtBuilder.withClaim("session", objectMapper.writeValueAsString(sessionData));
@@ -69,13 +76,15 @@ public class JWTSessionManagerBean implements JWTSessionManager{
         try {
             DecodedJWT jwt = verifier.verify(token);
             String payload = new String(Base64.getDecoder().decode(jwt.getPayload()));
-            Map<String, Object> payloadMap = objectMapper.readValue(payload, new TypeReference<Map<String, Object>>(){});
+            Map<String, Object> payloadMap = objectMapper.readValue(payload, mapTypeReference);
             this.creationTime = (long) payloadMap.get("ct");
             this.lastAccessedTime = (long) payloadMap.get("lat");
-            this.maxInactiveInterval = (int) payloadMap.get("mii");
+            this.maxInactiveInterval = payloadMap.get("mii") != null ? (int) payloadMap.get("mii")
+                    : configurationManager.getConfiguration().getMaxInactiveInterval();
+            if(Instant.now().toEpochMilli() > lastAccessedTime + maxInactiveInterval * 1000L)
+                throw new TokenExpiredException("");
             this.sessionData = payloadMap.get("session") == null ? new HashMap<>()
-                    : objectMapper.readValue((String) payloadMap.get("session"), new TypeReference<Map<String, Object>>(){});
-            this.isExpired = Date.from(Instant.now()).getTime() > maxInactiveInterval;
+                    : objectMapper.readValue((String) payloadMap.get("session"), mapTypeReference);
         } catch (JWTVerificationException | IOException e) {
             setDefaults();
         }
@@ -165,12 +174,16 @@ public class JWTSessionManagerBean implements JWTSessionManager{
     }
 
     @Override
-        public boolean isNew() {
+    public boolean isNew() {
+        if(isInvalidated)
+            throw new IllegalStateException(INVALIDATED_SESSION_EXCEPTION_MESSAGE);
         return lastAccessedTime == 0;
     }
 
     @Override
     public void invalidate() {
+        if(isInvalidated)
+            throw new IllegalStateException(INVALIDATED_SESSION_EXCEPTION_MESSAGE);
         isInvalidated = true;
     }
 
@@ -182,7 +195,7 @@ public class JWTSessionManagerBean implements JWTSessionManager{
     }
 
     private void reloadData() {
-        sessionData = objectMapper.convertValue(sessionData, new TypeReference<Map<String, Object>>(){});
+        sessionData = objectMapper.convertValue(sessionData, mapTypeReference);
     }
 
 }

@@ -1,4 +1,4 @@
-package pl.unak7.jwtee.samples.todo;
+package pl.unak7.jwtee.samples.auth;
 
 import com.auth0.jwt.algorithms.Algorithm;
 import pl.unak7.jwtee.JWTSessionConfiguration;
@@ -21,6 +21,10 @@ public class ConfigurationServletContextListener implements ServletContextListen
         try {
             configurationManager.configure(JWTSessionConfiguration.builder()
                     .algorithm(Algorithm.HMAC256("secr3t"))
+                    .headerName("Authorization")
+                    .headerValuePattern(String.format("^Bearer %s$", JWTSessionConfiguration.JWT_PATTERN))
+                    .attachTokenToResponse(false)
+                    .maxInactiveInterval(10)
                     .build()
             );
         } catch (UnsupportedEncodingException e) {

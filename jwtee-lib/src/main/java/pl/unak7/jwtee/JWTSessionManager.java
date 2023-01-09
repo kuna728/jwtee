@@ -7,13 +7,17 @@ import javax.ejb.Local;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionContext;
-import java.io.IOException;
-import java.util.Enumeration;
-import java.util.Map;
 
 @Local
 public interface JWTSessionManager extends HttpSession {
 
+    /**
+     *
+     * @param key              key from session map
+     * @param typeReference    jackson type reference
+     * @return                 value from session map with correct type
+     * @param <T>              type which value should be deserialized
+     */
     <T> T getAttribute(String key, TypeReference<T> typeReference);
 
     String getToken();

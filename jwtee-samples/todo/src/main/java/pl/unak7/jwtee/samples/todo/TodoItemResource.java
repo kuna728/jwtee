@@ -36,12 +36,8 @@ public class TodoItemResource {
         List<TodoItemDTO> items = getItemsFromToken();
         TodoItemDTO itemToAdd = new TodoItemDTO(items.size() + 1, newItemDTO.getName(), false);
         items.add(itemToAdd);
-        try {
-            sessionManager.put("items", items);
-            return Response.status(Response.Status.CREATED).entity(itemToAdd).build();
-        } catch (IOException e) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
-        }
+        sessionManager.setAttribute("items", items);
+        return Response.status(Response.Status.CREATED).entity(itemToAdd).build();
     }
 
     @PATCH
@@ -54,22 +50,25 @@ public class TodoItemResource {
         if(!itemToUpdate.isPresent())
             return Response.status(Response.Status.NO_CONTENT).build();
         itemToUpdate.get().setDone(updateItemDTO.getDone());
-        try {
-            sessionManager.put("items", items);
-            return Response.status(Response.Status.OK).entity(itemToUpdate).build();
-        } catch (IOException e) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
-        }
+        sessionManager.setAttribute("items", items);
+        return Response.status(Response.Status.OK).entity(itemToUpdate).build();
+    }
+
+    @DELETE
+    @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteItem(@PathParam("id") long id) {
+        List<TodoItemDTO> items = getItemsFromToken();
+        if(!items.removeIf(item -> item.getId() == id))
+            return Response.status(Response.Status.NO_CONTENT).build();
+        sessionManager.setAttribute("items", items);
+        return Response.status(Response.Status.OK).build();
     }
 
     private List<TodoItemDTO> getItemsFromToken() {
         ObjectMapper objectMapper = new ObjectMapper();
         List<TodoItemDTO> items;
-        try {
-            items = (List<TodoItemDTO>) sessionManager.get("items", new TypeReference<List<TodoItemDTO>>(){});
-        } catch (IOException e) {
-            items = new ArrayList<>();
-        }
+        items = (List<TodoItemDTO>) sessionManager.getAttribute("items", new TypeReference<List<TodoItemDTO>>(){});
         return items == null ? new ArrayList<>() : items;
     }
 

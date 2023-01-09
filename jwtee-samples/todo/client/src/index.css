@@ -1,3 +1,13 @@
+.todo-item .checkbox {
+    display: inline;
+    margin-right: 5px;
+}
 
+.todo-item .delete-icon {
+    color: #A9A9A9;
+    transition: all .1s linear .1s;
+}
 
-
+.todo-item .delete-icon:hover {
+    color: #fb0435;
+}
