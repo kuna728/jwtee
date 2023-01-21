@@ -96,6 +96,17 @@ public class JWTSessionManagerBeanOtherTest {
     }
 
     @Test
+    public void neverExpiresTest() {
+        sessionManager.setToken(utils.generateToken(utils.getExampleAlgorithm(), Utils.exampleCreationTime,
+                Utils.exampleLastAccessedTime, 0, utils.getExampleSession()));
+        Assertions.assertEquals(utils.getExampleSession().keySet().size(), sessionManager.getValueNames().length);
+
+        sessionManager.setToken(utils.generateToken(utils.getExampleAlgorithm(), Utils.exampleCreationTime,
+                Utils.exampleLastAccessedTime, -5, utils.getExampleSession()));
+        Assertions.assertEquals(utils.getExampleSession().keySet().size(), sessionManager.getValueNames().length);
+    }
+
+    @Test
     public void customMaxInactiveIntervalTest() {
         Mockito.lenient().when(configurationManager.getConfiguration()).thenReturn(
                 JWTSessionConfiguration.builder().algorithm(utils.getExampleAlgorithm()).maxInactiveInterval(20).build());
@@ -122,7 +133,7 @@ public class JWTSessionManagerBeanOtherTest {
     }
 
     @Test
-    public void tokenAbuseTest() { //TODO
+    public void tokenAbuseTest() {
         String token = utils.generateExampleToken();
         String[] parts = token.split("\\.");
         String decodedPayload = new String(Base64.getDecoder().decode(parts[1]));

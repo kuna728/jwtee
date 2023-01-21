@@ -10,7 +10,7 @@ export default function NewItem() {
     const [name, setName] = React.useState("");
 
     const handleClick = () => {
-        toast.promise(todo.addItem(name), {
+        toast.promise(todo.addItem(name).then(() => setName("")), {
             pending: "Adding new item...",
             success: "Item added successfully",
             error: "Item could not be added due to unexpected error"

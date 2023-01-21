@@ -19,7 +19,6 @@ import java.time.Instant;
 import java.util.*;
 
 @RequestScoped
-@Stateful
 public class JWTSessionManagerBean implements JWTSessionManager{
 
     private final static String INVALIDATED_SESSION_EXCEPTION_MESSAGE = "Session was invalidated";
@@ -81,7 +80,7 @@ public class JWTSessionManagerBean implements JWTSessionManager{
             this.lastAccessedTime = (long) payloadMap.get("lat");
             this.maxInactiveInterval = payloadMap.get("mii") != null ? (int) payloadMap.get("mii")
                     : configurationManager.getConfiguration().getMaxInactiveInterval();
-            if(Instant.now().toEpochMilli() > lastAccessedTime + maxInactiveInterval * 1000L)
+            if(maxInactiveInterval > 0 && Instant.now().toEpochMilli() > lastAccessedTime + maxInactiveInterval * 1000L)
                 throw new TokenExpiredException("");
             this.sessionData = payloadMap.get("session") == null ? new HashMap<>()
                     : objectMapper.readValue((String) payloadMap.get("session"), mapTypeReference);
@@ -92,14 +91,17 @@ public class JWTSessionManagerBean implements JWTSessionManager{
     }
 
     @Override
-    public <T> T getAttribute(String key, TypeReference<T> typeReference) {
+    public <T> T getAttribute(String name, TypeReference<T> typeReference) {
         if(isInvalidated)
             throw new IllegalStateException(INVALIDATED_SESSION_EXCEPTION_MESSAGE);
-        if(!sessionData.containsKey(key))
+        if(!sessionData.containsKey(name))
             return null;
-        return objectMapper.convertValue(sessionData.get(key), typeReference);
+        return objectMapper.convertValue(sessionData.get(name), typeReference);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object getAttribute(String name) {
         if(isInvalidated)
@@ -111,6 +113,7 @@ public class JWTSessionManagerBean implements JWTSessionManager{
     public Object getValue(String name) {
         return getAttribute(name);
     }
+
 
     @Override
     public Enumeration<String> getAttributeNames() {

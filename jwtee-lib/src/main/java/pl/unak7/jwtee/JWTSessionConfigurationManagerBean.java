@@ -4,12 +4,14 @@ package pl.unak7.jwtee;
 import com.auth0.jwt.algorithms.Algorithm;
 import org.apache.commons.lang3.RandomStringUtils;
 
-import javax.ejb.Stateful;
-import javax.enterprise.context.ApplicationScoped;
+import javax.ejb.Singleton;
+import javax.enterprise.context.ApplicationScoped;;
 import java.io.UnsupportedEncodingException;
 
-@ApplicationScoped
-@Stateful
+/**
+ * Bean which stores JWTee configuration in global application scoped state and allows user to manage the configuration.
+ */
+@Singleton
 public class JWTSessionConfigurationManagerBean implements JWTSessionConfigurationManager{
     private JWTSessionConfiguration configuration = JWTSessionConfiguration.builder().build();
     private final String randomSecret = RandomStringUtils.random(300);

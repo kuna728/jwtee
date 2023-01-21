@@ -9,14 +9,20 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@WebFilter(filterName = "jwtSessionFilter", urlPatterns = {"/api/*"})
+/**
+ * Filter required for JWTee to work properly.
+ * In pre-processing phase filter extracts token from request header and initializes JWTSessionManager with token value via setToken() method.
+ * In post-processing phase, if attachTokenToResponse configuration property is set to true, filter attaches token to response header. Token is retrieved via getToken() method in JWTSessionManager.
+ * Filter is applicable for all application endpoints i.e. url pattern equals {@code "/*"}.
+ */
+@WebFilter(filterName = "jwtSessionFilter", urlPatterns = {"/*"})
 public class JWTSessionFilter implements Filter {
 
     @Inject
-    JWTSessionManager sessionManager;
+    private JWTSessionManager sessionManager;
 
     @Inject
-    JWTSessionConfigurationManager configurationManager;
+    private JWTSessionConfigurationManager configurationManager;
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
