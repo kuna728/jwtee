@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button, Col, Container, Form, InputGroup, ListGroup, Navbar, Row} from "react-bootstrap";
+import {Button, Col, Container, Form, InputGroup, ListGroup, Nav, Navbar, NavDropdown, Row} from "react-bootstrap";
 import NewItem from "./components/NewItem.";
 import ItemsList from "./components/ItemsList";
 import TodoContext from "./context/TodoContext";
@@ -13,9 +13,18 @@ export default function App() {
         <Container fluid style={{padding: 0}}>
             <Navbar expand="lg" bg="primary" variant="dark">
                 <Container>
-                    <Navbar.Brand href="#" style={{fontSize: 25, fontWeight: "bolder", letterSpacing: 3}}>TODO</Navbar.Brand>
+                    <Navbar.Brand style={{fontSize: 25, fontWeight: "bolder", letterSpacing: 3}}>JWTee</Navbar.Brand>
                     <Navbar.Toggle />
-                    <Navbar.Text style={{color: "white"}}>jwtee samples</Navbar.Text>
+                    <Navbar.Collapse id="basic-navbar-nav" >
+                        <Nav className="me-auto">
+                            <Nav.Link href="/">Home</Nav.Link>
+                            <Nav.Link href="/docs.html">Docs</Nav.Link>
+                            <NavDropdown title="Samples" id="basic-nav-dropdown" active>
+                                <NavDropdown.Item href="/samples/todo" style={{fontWeight: "bold"}}>Todo</NavDropdown.Item>
+                                <NavDropdown.Item href="/samples/auth">Auth</NavDropdown.Item>
+                            </NavDropdown>
+                        </Nav>
+                    </Navbar.Collapse>
                 </Container>
             </Navbar>
             <Container>

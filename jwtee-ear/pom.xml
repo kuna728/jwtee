@@ -1,0 +1,68 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>pl.unak7.jwtee</groupId>
+        <artifactId>jwtee-parent</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>jwtee-ear</artifactId>
+    <packaging>ear</packaging>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>pl.unak7.jwtee</groupId>
+            <artifactId>jwtee-web</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>pl.unak7.jwtee.samples</groupId>
+            <artifactId>auth</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>pl.unak7.jwtee.samples</groupId>
+            <artifactId>todo</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-ear-plugin</artifactId>
+                <configuration>
+                    <finalName>jwtee</finalName>
+                        <modules>
+                            <webModule>
+                                <groupId>pl.unak7.jwtee</groupId>
+                                <artifactId>jwtee-web</artifactId>
+                                <contextRoot>/</contextRoot>
+                                <bundleFileName>jwtee-web-${project.version}.war</bundleFileName>
+                            </webModule>
+                            <webModule>
+                                <groupId>pl.unak7.jwtee.samples</groupId>
+                                <artifactId>auth</artifactId>
+                                <contextRoot>/samples/auth</contextRoot>
+                                <bundleFileName>auth-${project.version}.war</bundleFileName>
+                            </webModule>
+                            <webModule>
+                                <groupId>pl.unak7.jwtee.samples</groupId>
+                                <artifactId>todo</artifactId>
+                                <contextRoot>/samples/todo</contextRoot>
+                                <bundleFileName>todo-${project.version}.war</bundleFileName>
+                            </webModule>
+                        </modules>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

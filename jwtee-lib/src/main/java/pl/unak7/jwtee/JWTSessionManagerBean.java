@@ -84,7 +84,7 @@ public class JWTSessionManagerBean implements JWTSessionManager{
                 throw new TokenExpiredException("");
             this.sessionData = payloadMap.get("session") == null ? new HashMap<>()
                     : objectMapper.readValue((String) payloadMap.get("session"), mapTypeReference);
-        } catch (JWTVerificationException | IOException e) {
+        } catch (Exception e) {
             setDefaults();
         }
 

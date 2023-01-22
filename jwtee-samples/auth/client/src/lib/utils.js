@@ -1,5 +1,6 @@
+import {base} from "$app/paths";
 
-export const API_URL = "http://localhost:8080/auth-1.0-SNAPSHOT/api";
+export const API_URL = `${base}/api`;
 
 export const fetchPost = (resource, data) => {
     return fetch(`${API_URL}/${resource}`, {

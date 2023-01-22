@@ -90,6 +90,14 @@
                         <link>https://www.javadoc.io/doc/javax.servlet/javax.servlet-api/4.0.1</link>
                     </links>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

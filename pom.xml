@@ -8,6 +8,8 @@
   <modules>
     <module>jwtee-lib</module>
     <module>jwtee-samples</module>
+    <module>jwtee-web</module>
+    <module>jwtee-ear</module>
   </modules>
   <packaging>pom</packaging>
 

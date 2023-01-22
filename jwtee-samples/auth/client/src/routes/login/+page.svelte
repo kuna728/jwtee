@@ -7,9 +7,10 @@
     import {json} from "@sveltejs/kit";
     import { page } from '$app/stores';
     import {onMount} from "svelte";
+    import {base} from "$app/paths";
 
     if($user.token != null)
-        goto("/");
+        goto(`${base}`);
 
     let username = "";
     let password = "";
@@ -28,7 +29,7 @@
                 isLoading = false;
                 sessionExpired = false;
                 if(json.success)
-                    goto("/");
+                    goto(`${base}`);
                 else
                     failAlert = "Credentials you provided are not correct";
             }).catch(error => {

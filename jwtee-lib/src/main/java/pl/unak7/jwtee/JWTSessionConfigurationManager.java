@@ -3,7 +3,7 @@ package pl.unak7.jwtee;
 import javax.ejb.Local;
 
 /**
- * Interface which allows JWTee configuration management.
+ * Interface enabling JWTee configuration management.
  */
 @Local
 public interface JWTSessionConfigurationManager {

@@ -4,9 +4,10 @@
     import {goto} from "$app/navigation";
     import {slide} from "svelte/transition";
     import {logout, updateCounter} from "$lib/UserService.js";
+    import {base} from "$app/paths";
 
     if($user.token == null)
-        goto("/login");
+        goto(`${base}/login`);
 
     let isSuccess = null;
     let isLoading = false;
@@ -20,7 +21,7 @@
             console.log(e.message)
             if(e.message === "401") {
                 logout();
-                goto("/login#session-expired");
+                goto(`${base}/login#session-expired`);
             }
             isLoading = false;
             isSuccess = false;
@@ -29,7 +30,7 @@
 
     const onLogout = () => {
         logout();
-        goto("/login");
+        goto(`${base}/login`);
     }
 </script>
 

@@ -9,7 +9,7 @@ import javax.enterprise.context.ApplicationScoped;;
 import java.io.UnsupportedEncodingException;
 
 /**
- * Bean which stores JWTee configuration in global application scoped state and allows user to manage the configuration.
+ * Bean storing JWTee configuration in global application scoped state and enables user to manage the configuration.
  */
 @Singleton
 public class JWTSessionConfigurationManagerBean implements JWTSessionConfigurationManager{

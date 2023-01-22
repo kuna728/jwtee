@@ -1,7 +1,7 @@
 import React from "react";
 import TodoContext from "./TodoContext";
 
-const RESOURCE_URL = "/todo-1.0-SNAPSHOT/api/item"
+const RESOURCE_URL = "api/item"
 
 const getHeaders = token => ({
     'Accept': 'application/json',

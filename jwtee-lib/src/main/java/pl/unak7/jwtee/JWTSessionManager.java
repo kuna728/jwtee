@@ -10,7 +10,6 @@ import javax.servlet.http.HttpSessionContext;
 
 /**
  * Interface enabling client-side session management.
- *
  */
 @Local
 public interface JWTSessionManager extends HttpSession {
@@ -39,21 +38,35 @@ public interface JWTSessionManager extends HttpSession {
     String getToken();
 
     /**
-     *
-     * @param token
+     * Initializes manager with session data and metadata retrieved from the token.
+     * Initializes manager with defaults if token is null, empty, invalid or expired.
+     * Method is mainly used by the {@link JWTSessionFilter}, however, library clients can use this method to, for example, start a new session after invalidating the previous one.
+     * @param token a session token string
      */
     void setToken(String token);
 
+    /**
+     * Method is not implemented. An attempt to call it will end up throwing a NotImplementedException.
+     * @throws NotImplementedException each time it is called
+     */
     @Override
     default String getId() {
         throw new NotImplementedException();
     }
 
+    /**
+     * Method is not implemented. An attempt to call it will end up throwing a NotImplementedException.
+     * @throws NotImplementedException each time it is called
+     */
     @Override
     default ServletContext getServletContext() {
         throw new NotImplementedException();
     }
 
+    /**
+     * Method is not implemented. An attempt to call it will end up throwing a NotImplementedException.
+     * @throws NotImplementedException each time it is called
+     */
     @Override
     default HttpSessionContext getSessionContext() {
         throw new NotImplementedException();
