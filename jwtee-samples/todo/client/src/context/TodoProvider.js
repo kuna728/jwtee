@@ -20,13 +20,11 @@ export default function TodoProvider({children}) {
     const fetchItems = () => fetch(RESOURCE_URL, {
         headers: getHeaders(token)
     }).then(res => {
-        console.log(res)
         if(res.ok)
             return res.json()
         throw new Error();
     }).then(json => {
         setItems(json);
-        console.log(json)
     });
 
     const addItem = name => delayRand().then(() => fetch(RESOURCE_URL, {

@@ -1,8 +1,8 @@
-package pl.unak7.jwtee.samples.todo;
+package pl.unak7.jwtee.samples.todo.web;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import pl.unak7.jwtee.JWTSessionManager;
+import pl.unak7.jwtee.lib.JWTSessionManager;
 import pl.unak7.jwtee.samples.todo.dto.NewItemDTO;
 import pl.unak7.jwtee.samples.todo.dto.TodoItemDTO;
 import pl.unak7.jwtee.samples.todo.dto.UpdateItemDTO;
@@ -48,7 +48,7 @@ public class TodoItemResource {
         List<TodoItemDTO> items = getItemsFromToken();
         Optional<TodoItemDTO> itemToUpdate = items.stream().filter(item -> item.getId() == id).findAny();
         if(!itemToUpdate.isPresent())
-            return Response.status(Response.Status.NO_CONTENT).build();
+            return Response.status(Response.Status.NOT_FOUND).build();
         itemToUpdate.get().setDone(updateItemDTO.getDone());
         sessionManager.setAttribute("items", items);
         return Response.status(Response.Status.OK).entity(itemToUpdate).build();
@@ -60,15 +60,13 @@ public class TodoItemResource {
     public Response deleteItem(@PathParam("id") long id) {
         List<TodoItemDTO> items = getItemsFromToken();
         if(!items.removeIf(item -> item.getId() == id))
-            return Response.status(Response.Status.NO_CONTENT).build();
+            return Response.status(Response.Status.NOT_FOUND).build();
         sessionManager.setAttribute("items", items);
         return Response.status(Response.Status.OK).build();
     }
 
     private List<TodoItemDTO> getItemsFromToken() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        List<TodoItemDTO> items;
-        items = (List<TodoItemDTO>) sessionManager.getAttribute("items", new TypeReference<List<TodoItemDTO>>(){});
+        List<TodoItemDTO> items = sessionManager.getAttribute("items", new TypeReference<List<TodoItemDTO>>(){});
         return items == null ? new ArrayList<>() : items;
     }
 

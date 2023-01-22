@@ -19,18 +19,19 @@ import java.time.Instant;
 import java.util.*;
 
 @RequestScoped
-public class JWTSessionManagerBean implements JWTSessionManager{
+@Stateful
+public class JWTSessionManagerBean implements JWTSessionManager {
 
     private final static String INVALIDATED_SESSION_EXCEPTION_MESSAGE = "Session was invalidated";
 
     private final static TypeReference mapTypeReference = new TypeReference<Map<String, Object>>(){};
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     @Inject
     JWTSessionConfigurationManager configurationManager;
 
     private Map<String, Object> sessionData;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     private long creationTime;
 
@@ -87,7 +88,6 @@ public class JWTSessionManagerBean implements JWTSessionManager{
         } catch (Exception e) {
             setDefaults();
         }
-
     }
 
     @Override
