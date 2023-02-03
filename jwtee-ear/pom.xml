@@ -40,7 +40,6 @@
             <plugin>
                 <artifactId>maven-ear-plugin</artifactId>
                 <configuration>
-                    <finalName>jwtee</finalName>
                         <modules>
                             <webModule>
                                 <groupId>pl.unak7.jwtee</groupId>

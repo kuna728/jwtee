@@ -2,7 +2,7 @@ package pl.unak7.jwtee.samples.todo.web;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import pl.unak7.jwtee.lib.JWTSessionManager;
+import pl.unak7.jwtee.JWTSessionManager;
 import pl.unak7.jwtee.samples.todo.dto.NewItemDTO;
 import pl.unak7.jwtee.samples.todo.dto.TodoItemDTO;
 import pl.unak7.jwtee.samples.todo.dto.UpdateItemDTO;
