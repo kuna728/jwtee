@@ -23,12 +23,6 @@
         </dependency>
         <dependency>
             <groupId>pl.unak7.jwtee.samples</groupId>
-            <artifactId>auth</artifactId>
-            <version>${project.version}</version>
-            <type>war</type>
-        </dependency>
-        <dependency>
-            <groupId>pl.unak7.jwtee.samples</groupId>
             <artifactId>todo</artifactId>
             <version>${project.version}</version>
             <type>war</type>
@@ -40,26 +34,21 @@
             <plugin>
                 <artifactId>maven-ear-plugin</artifactId>
                 <configuration>
-                        <modules>
-                            <webModule>
-                                <groupId>pl.unak7.jwtee</groupId>
-                                <artifactId>jwtee-web</artifactId>
-                                <contextRoot>/</contextRoot>
-                                <bundleFileName>jwtee-web-${project.version}.war</bundleFileName>
-                            </webModule>
-                            <webModule>
-                                <groupId>pl.unak7.jwtee.samples</groupId>
-                                <artifactId>auth</artifactId>
-                                <contextRoot>/samples/auth</contextRoot>
-                                <bundleFileName>auth-${project.version}.war</bundleFileName>
-                            </webModule>
-                            <webModule>
-                                <groupId>pl.unak7.jwtee.samples</groupId>
-                                <artifactId>todo</artifactId>
-                                <contextRoot>/samples/todo</contextRoot>
-                                <bundleFileName>todo-${project.version}.war</bundleFileName>
-                            </webModule>
-                        </modules>
+                    <finalName>jwtee</finalName>
+                    <modules>
+                        <webModule>
+                            <groupId>pl.unak7.jwtee</groupId>
+                            <artifactId>jwtee-web</artifactId>
+                            <contextRoot>/</contextRoot>
+                            <bundleFileName>jwtee-web-${project.version}.war</bundleFileName>
+                        </webModule>
+                        <webModule>
+                            <groupId>pl.unak7.jwtee.samples</groupId>
+                            <artifactId>todo</artifactId>
+                            <contextRoot>/samples/todo</contextRoot>
+                            <bundleFileName>todo-${project.version}.war</bundleFileName>
+                        </webModule>
+                    </modules>
                 </configuration>
             </plugin>
         </plugins>

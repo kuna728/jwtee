@@ -21,7 +21,7 @@ export default function App() {
                             <Nav.Link href="/docs.html">Docs</Nav.Link>
                             <NavDropdown title="Samples" id="basic-nav-dropdown" active>
                                 <NavDropdown.Item href="/samples/todo" style={{fontWeight: "bold"}}>Todo</NavDropdown.Item>
-                                <NavDropdown.Item href="/samples/auth">Auth</NavDropdown.Item>
+                                <NavDropdown.Item href="/samples/auth" disabled>Auth</NavDropdown.Item>
                             </NavDropdown>
                         </Nav>
                     </Navbar.Collapse>
